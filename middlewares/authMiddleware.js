@@ -26,7 +26,7 @@ export default class AuthMiddleware {
       let usuarioModel = new UsuarioModel()
       let usuario = await usuarioModel.obterCompleto(usuarioToken.id)
       if (usuario) {
-        req.usuarioLogado = usuario[0]
+        req.usuarioLogado = usuario
         next()
       } else {
         res.status(401).json({ msg: "Não autorizado" })

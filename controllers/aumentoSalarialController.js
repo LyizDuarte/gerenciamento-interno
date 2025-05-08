@@ -11,22 +11,23 @@ export default class AumentoSalarialController {
   }
 
   async registrarAumento(req, res) {
-    let { percentual, usuarioId } = req.body
-    if (!percentual || !usuarioId) {
-      res.status(400).json({ msg: "Todos os campos são obrigatórios" })
+    
+    let { percentual} = req.body
+    if (!percentual) {
+      return res.status(400).json({ msg: "Precisa informar o percentual!" })
     }
-    let usuario = req.usuarioLogado
+    let usuario = req.usuarioLogado.id
     if (!usuario) {
-      res.status(404).json({ msg: "Você precisa estar autenticado!" })
+      return res.status(404).json({ msg: "Você precisa estar autenticado!" })
     }
     let registro = await this.#aumentoModel.registrarAumento(percentual, usuario)
     if (!registro) {
-      res.status(500).json({ msg: "O registro de aumento não foi criado" })
+      return res.status(500).json({ msg: "O registro de aumento não foi criado" })
     }
 
     let aumento = await this.#aumentoModel.aumentarSalario(percentual)
     if (!aumento) {
-      res.status(500).json({ msg: "O aumento do salário não foi feito" })
+      return res.status(500).json({ msg: "O aumento do salário não foi feito" })
     }
     res.status(200).json({
       msg: "O registro de aumento foi criado com sucesso e os funcionários tiveram aumento!",
