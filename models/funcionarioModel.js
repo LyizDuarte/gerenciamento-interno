@@ -70,6 +70,26 @@ export default class FuncionarioModel {
     this.#cargo = cargo
   }
 
+  async listar(db) {
+    let sql = "select * from tb_funcionario where fun_datademissao is null"
+    let rows = await db.ExecutaComando(sql)
+    let lista = []
+    for (let row of rows) {
+      lista.push(
+        new FuncionarioModel(
+          row["fun_id"],
+          row["fun_cpf"],
+          row["fun_nome"],
+          row["fun_salario"],
+          row["fun_datadmissao"],
+          row["fun_datademissao"],
+          row["car_id"]
+        )
+      )
+    }
+    return lista
+  }
+
   async gravar(funcionario) {
     let sql = `insert into tb_funcionario (fun_cpf, fun_nome, fun_salario, fun_datadmissao, car_id)
         values (?, ?, ?, ?, ?)`

@@ -1,16 +1,10 @@
 import Database from "../db/database.js"
 
 export default class FolhaModel {
-  #banco
-
   #id
   #ano
   #mes
   #valorTotal
-
-  set banco(value) {
-    this.#banco = value
-  }
 
   get id() {
     return this.#id
@@ -37,27 +31,24 @@ export default class FolhaModel {
     this.#valorTotal = value
   }
 
-  constructor(id, ano, mes, valorTotal) {
-    this.#banco = new Database()
-
-    this.#id = id
+  constructor(ano, mes, valorTotal) {
     this.#ano = ano
     this.#mes = mes
     this.#valorTotal = valorTotal
   }
 
-  async gravar() {
+  async gravar(banco) {
     let sql = `insert into tb_folhapagamento (fol_ano, fol_mes, fol_valortotal) values (?, ?, ?)`
     let params = [this.#ano, this.#mes, this.#valorTotal]
-    let result = await this.#banco.ExecutaComandoLastInserted(sql, params)
+    let result = await banco.ExecutaComandoLastInserted(sql, params)
     this.#id = result
     return result
   }
 
-  async atualizar() {
+  async atualizar(banco) {
     let sql = `update tb_folhapagamento set fol_ano = ?, fol_mes = ?, fol_valortotal = ? where fol_id = ?`
     let params = [this.#ano, this.#mes, this.#valorTotal, this.#id]
-    let result = await this.#banco.ExecutaComando(sql, params)
+    let result = await banco.ExecutaComando(sql, params)
     return result
   }
 }

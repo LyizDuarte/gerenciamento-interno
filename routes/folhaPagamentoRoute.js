@@ -6,9 +6,9 @@ const router = express.Router()
 let ctrl = new FolhaController()
 let auth = new AuthMiddleware()
 
-router.get("/folha", auth.validar, (req, res) => {
+router.post("/folha", auth.validar, (req, res) => {
   // #swagger.tags = ["Folha de Pagamento"]
-  // #swagger.summary = "Exibe a folha de pagamento"
+  // #swagger.summary = "Gera a folha de pagamento"
   /* 
     #swagger.security = [{
         "bearerAuth": []    

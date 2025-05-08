@@ -1,94 +1,82 @@
 import mysql from 'mysql2';
 
 export default class Database {
+  #pool;
+  #conexaoTransacao = null;
 
-    #conexao;
+  constructor() {
+    this.#pool = mysql.createPool({
+      host: '127.0.0.1',
+      database: 'rh',
+      user: 'root',
+      password: '13012003',
+    });
+  }
 
-    get conexao() { return this.#conexao;} set conexao(conexao) { this.#conexao = conexao; }
+  get conexao() {
+    return this.#conexaoTransacao || this.#pool;
+  }
 
-    constructor() {
-
-        this.#conexao = mysql.createPool({
-            host: '132.226.245.178', //endereço do nosso banco de dados na nuvem
-            database: 'PFS2_106888', //a database de cada um de vocês possui a nomenclatura DB_(RA)
-            user: '106888', // usuario e senha de cada um de vocês é o RA
-            password: '106888',
+  async AbreTransacao() {
+    return new Promise((resolve, reject) => {
+      this.#pool.getConnection((err, connection) => {
+        if (err) return reject(err);
+        connection.beginTransaction((err) => {
+          if (err) return reject(err);
+          this.#conexaoTransacao = connection;
+          resolve();
         });
-    }
+      });
+    });
+  }
 
-    AbreTransacao() {
-        var cnn = this.#conexao;
-        return new Promise(function(res, rej) {
-            cnn.query("START TRANSACTION", function (error, results, fields) {
-                if (error) 
-                    rej(error);
-                else
-                    res(results);
-            });
-        })
-    }
-     
-    Rollback() {
-        var cnn = this.#conexao;
-        return new Promise(function(res, rej) {
-            cnn.query("ROLLBACK", function (error, results, fields) {
-                if (error) 
-                    rej(error);
-                else
-                    res(results);
-            });
-        })
-    }
-     
-    Commit() {
-        var cnn = this.#conexao;
-        return new Promise(function(res, rej) {
-            cnn.query("COMMIT", function (error, results, fields) {
-                if (error) 
-                    rej(error);
-                else
-                    res(results);
-            });
-        })
-    }
+  async Commit() {
+    return new Promise((resolve, reject) => {
+      if (!this.#conexaoTransacao) return reject(new Error("Sem transação ativa"));
+      this.#conexaoTransacao.commit((err) => {
+        if (err) return reject(err);
+        this.#conexaoTransacao.release();
+        this.#conexaoTransacao = null;
+        resolve();
+      });
+    });
+  }
 
-    ExecutaComando(sql, valores) {
-        var cnn = this.#conexao;
-        return new Promise(function(res, rej) {
-            cnn.query(sql, valores, function (error, results, fields) {
-                if (error) 
-                    rej(error);
-                else 
-                    res(results);
-            });
-        })
-    }
-    
-    ExecutaComandoNonQuery(sql, valores) {
-        var cnn = this.#conexao;
-        return new Promise(function(res, rej) {
-            cnn.query(sql, valores, function (error, results, fields) {
-                if (error) 
-                    rej(error);
-                else 
-                    res(results.affectedRows > 0);
-            });
-        })
-    }
+  async Rollback() {
+    return new Promise((resolve, reject) => {
+      if (!this.#conexaoTransacao) return reject(new Error("Sem transação ativa"));
+      this.#conexaoTransacao.rollback(() => {
+        this.#conexaoTransacao.release();
+        this.#conexaoTransacao = null;
+        resolve();
+      });
+    });
+  }
 
-    ExecutaComandoLastInserted(sql, valores) {
-        var cnn = this.#conexao;
-        return new Promise(function(res, rej) {
-            cnn.query(sql, valores, function (error, results, fields) {
-                if (error) 
-                    rej(error);
-                else 
-                    res(results.insertId);
-            });
-        })
-    }
+  async ExecutaComando(sql, valores = []) {
+    return new Promise((resolve, reject) => {
+      this.conexao.query(sql, valores, (err, results) => {
+        if (err) reject(err);
+        else resolve(results);
+      });
+    });
+  }
 
+  async ExecutaComandoNonQuery(sql, valores = []) {
+    return new Promise((resolve, reject) => {
+      this.conexao.query(sql, valores, (err, results) => {
+        if (err) reject(err);
+        else resolve(results.affectedRows > 0);
+      });
+    });
+  }
+
+  async ExecutaComandoLastInserted(sql, valores = []) {
+    return new Promise((resolve, reject) => {
+      this.conexao.query(sql, valores, (err, results) => {
+        if (err) reject(err);
+        else resolve(results.insertId);
+      });
+    });
+  }
 }
-
-
-

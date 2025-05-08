@@ -1,16 +1,10 @@
 import Database from "../db/database.js"
 
 export default class ItensFolhaModel {
-  #banco
-
   #id
   #salario
   #funcionario
   #folha
-
-  set banco(value) {
-    this.#banco = value
-  }
 
   get id() {
     return this.#id
@@ -38,7 +32,6 @@ export default class ItensFolhaModel {
   }
 
   constructor(id, salario, funcionario, folha) {
-    this.#banco = new Database()
 
     this.#id = id
     this.#salario = salario
@@ -46,10 +39,10 @@ export default class ItensFolhaModel {
     this.#folha = folha
   }
 
-  async gravar() {
+  async gravar(banco) {
     let sql = `insert into tb_itensfolhapagamento (ifp_salario, fun_id, fol_id) values (?, ?, ?)`
-    let params = [salario, funcionario, folha]
-    let result = await this.#banco.ExecutaComando(sql, params)
+    let params = [this.#salario, this.#funcionario, this.#folha]
+    let result = await banco.ExecutaComando(sql, params)
     return result
   }
 }
