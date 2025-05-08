@@ -1,0 +1,250 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sistema de Gerenciamento de RH - API",
+    "description": "API do sistema de gerenciment do departamento de Recursos Humanos",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/"
+    }
+  ],
+  "paths": {
+    "/autenticacao": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Gera um token para um aluno matriculado",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/usuarioRH"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/funcionario": {
+      "post": {
+        "tags": [
+          "Funcionario"
+        ],
+        "summary": "Cadastra um funcionario",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/funcionario"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/funcionario/demitir": {
+      "post": {
+        "tags": [
+          "Funcionario"
+        ],
+        "summary": "Demite um funcionario",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/funcionarioDemitir"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aumento": {
+      "post": {
+        "tags": [
+          "Aumento Salarial"
+        ],
+        "summary": "Registra e faz o aumento dos funcionários",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/aumentoSalarial"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/folha": {
+      "get": {
+        "tags": [
+          "Folha de Pagamento"
+        ],
+        "summary": "Exibe a folha de pagamento",
+        "description": "",
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "funcionario": {
+        "type": "object",
+        "properties": {
+          "cpf": {
+            "type": "string",
+            "example": "4972382343"
+          },
+          "nome": {
+            "type": "string",
+            "example": "Etevaldinho Bilu"
+          },
+          "salario": {
+            "type": "number",
+            "example": 1500
+          },
+          "cargo": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "funcionarioDemitir": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "aumentoSalarial": {
+        "type": "object",
+        "properties": {
+          "percentual": {
+            "type": "number",
+            "example": 10
+          },
+          "usuarioId": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "usuarioRH": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "maria@rh.com"
+          },
+          "senha": {
+            "type": "number",
+            "example": 123
+          }
+        }
+      }
+    }
+  }
+}
