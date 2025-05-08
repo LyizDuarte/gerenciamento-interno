@@ -46,14 +46,18 @@ export default class FolhaModel {
     this.#valorTotal = valorTotal
   }
 
-  async gravar(ano, mes, valortotal) {
-    let sql = `insert into tb_folha (fol_ano, fol_mes, fol_valortotal) values (?, ?, ?)`
-    let params = [ano, mes, valortotal]
+  async gravar() {
+    let sql = `insert into tb_folhapagamento (fol_ano, fol_mes, fol_valortotal) values (?, ?, ?)`
+    let params = [this.#ano, this.#mes, this.#valorTotal]
     let result = await this.#banco.ExecutaComandoLastInserted(sql, params)
-    if (result) {
-      let folha = result
-      return folha
-    }
-    return null
+    this.#id = result
+    return result
+  }
+
+  async atualizar() {
+    let sql = `update tb_folhapagamento set fol_ano = ?, fol_mes = ?, fol_valortotal = ? where fol_id = ?`
+    let params = [this.#ano, this.#mes, this.#valorTotal, this.#id]
+    let result = await this.#banco.ExecutaComando(sql, params)
+    return result
   }
 }
